@@ -1,0 +1,99 @@
+package br.com.escalolamento;
+
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Escalonamento {
+
+	public static void main(String[] args) {
+		
+		/**
+		 * @author 
+		 * Este programa exemplifca a utilizaÃ§Ã£o de um processo escalonado por tempo em java
+		 *  */
+		
+		int[][]processos;//MATRIX (?x2) QUE ARMAZENARÃ� NA COLUNA 0 O TEMPO DO PROCESSO E NA COLUNA 1 O TEMPO LIMITE
+		Scanner s = new Scanner(System.in);//RECEBERÃ� AS ENTRADAS DO TECLADO
+		int qtdProcessos=0;//NUMERO DE PROCESSOS QUE SERÃƒO EXECUTADO EM CADA ITERAÃ‡ÃƒO		
+		int tempoAtual=0;//CONTROLE DE TEMPO		
+		ArrayList<Integer>ordemExecucao;//ARMAZERÃ� AS INFORMAÃ‡OES DOS PROCESSOS QUE SERÃƒO EXECUTADOS NA ORDEM DE EXECUÃ‡ÃƒO
+		ArrayList<String>estouro;//AMAZENARÃ� AS INFORMAÃ‡Ã•ES SOBRE OS PROCESSO QUE ESTOURARAM O TEMPO
+		int menorTempo=0;//SERÃ� UTILIZADO PARA ORDENAR O PROCESSO NA ORDEM CERTA
+		
+		System.out.println("O tempo atual Ã©: "+tempoAtual);
+		System.out.println("Quantos processos serÃ£o executados?");
+		qtdProcessos = s.nextInt();
+		processos = new int[qtdProcessos][2];
+		//ENQUANTO EXISTIREM PROCESSOS A SEREM EXECUTADOS PERMANECERÃ� NO LAÃ‡O
+		while(qtdProcessos!=0) {
+			//RECEBE O TEMPO DE EXECUÃ‡ÃƒO E O TEMPO LIMITE QUE CADA PROCESSO TEM PARA SER EXECUTADO			
+			for(int x =0;x<qtdProcessos;x++) {	
+				//RECEBE O TEMPO QUE O PROCESSO LEVA PRA SER EXECUTADO
+				System.out.println("O "+(x+1)+"Âº Processo leva quanto tempo: ");
+				processos[x][0]= s.nextInt();
+				//O TEMPO DENTRO DO QUAL O PROCESSO DEVERÃ� SER EXECUTADO
+				/**
+				 * O tempo limite foi incluido nesse exemplo para mostra melhor como o progrma prioriza os processo pelo menor tempo
+				 * sendo assim considere este valor como sendo uma variavel que poderia ser utilizada como critÃ©rio para definir qual processo
+				 * deveria ser iniciado primeiro, nesse caso o tempo limite deve ser informado como um valor superior ao tempo atual e superior 
+				 * a Tempo atual + Tempo de ExecuÃ§Ã£o
+				 *  */
+				System.out.println("O tempo limite do "+(x+1)+"Âº Processo Ã©: ");
+				processos[x][1]= s.nextInt();
+				
+				//REALIZA A VALIDAÃ‡ÃƒO DO TEMPO LIMITE, ENAQUANTO O VALOR INFORMADO NÃƒO ATENDER AS RESTRIÃ‡Ã•ES SERÃ� SOLICITADO QUE O USUARIO INFORME NOVAMENTO UM VALOR VÃ�LIDO				
+				if(processos[x][1]<=tempoAtual || processos[x][1]<=processos[x][0]+tempoAtual)
+				{
+					while(processos[x][1]<=tempoAtual || processos[x][1]<=processos[x][0]+tempoAtual) {
+						System.out.println("Deve ser superior ao tempo atual e superior a Tempo atual + Tempo de ExecuÃ§Ã£o!");
+						System.out.println("O tempo limite do "+(x+1)+"Âº Processo Ã©: ");
+						processos[x][1]= s.nextInt();
+					}
+				}
+			}			
+			ordemExecucao = new ArrayList<>();
+			//DEFINE A ORDEM DE EXECUÃ‡ÃƒO DOS PROCESSOS INFORMADOS PRIORIZANDO CADA UM PELO TEMPO QUE LEVAM PARA COMPLETAR A AÃ‡ÃƒO DO MENOR PARA O MAIOR
+			while (ordemExecucao.size()<qtdProcessos) {
+				int idAtualMenor=-1;
+				for(int x=0;x<processos.length;x++) {
+					if((menorTempo==0 || processos[x][0]<menorTempo) && !ordemExecucao.contains(x)) {					
+						menorTempo= processos[x][0];
+						idAtualMenor=x;
+					}
+				}
+				ordemExecucao.add(idAtualMenor);
+				menorTempo=0;			
+			}	
+			estouro = new ArrayList<>();
+			//EXEMPLIFICA AS AÃ‡Ã•ES SENDO EXECUTADAS		
+			for(int i:ordemExecucao) {
+				System.out.println("O "+i+"Âº Processo foi executado em "+(tempoAtual+processos[i][0])+"ms");
+				tempoAtual+=processos[i][0];
+				//ESSA ITERAÃ‡ÃƒO VERIFICA SE ALGUM PROCESSO FOI EXECUTADO FORA DO TEMPO PREVISTO E LANÃ‡A A MENSAGEM INFORMANDO O TEMPO DE ATRASO
+				for(int x=0;x<processos.length;x++) {
+					if(processos[i][0]<tempoAtual) {
+						estouro.add("O "+i+"Âº Processo estourou o tempo em: "+(tempoAtual-processos[i][0])+"ms");
+						break;
+					}
+				}
+			}
+			//SE EXISTIR TAREFAS QUE ESTOURARAM O TEMPO PREVISTO ELAS SERÃƒO EXIBIDAS AQUI
+			System.out.println("PROBLEMAS:");
+			for(String s1:estouro) {
+				System.out.println(s1);
+			}
+			System.out.println("-------------------");
+			//INICIA UMA NOVA SEQUENCIA DE PROCESSOS
+			tempoAtual=0;
+			System.out.println("O tempo atual Ã©: "+tempoAtual);
+			System.out.println("Quantos processos serÃ£o executados?");
+			qtdProcessos = s.nextInt();
+			processos = new int[qtdProcessos][2];
+			
+		}
+		
+		
+	}
+
+}
